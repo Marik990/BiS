@@ -1,0 +1,168 @@
+ZAD 1)
+
+DECLARE
+    numer_max INT;
+BEGIN
+   SELECT MAX(DEPARTMENT_ID) INTO numer_max FROM DEPARTMENTS;
+   DBMS_OUTPUT.put_line (numer_max);
+   numer_max := numer_max+10;
+   INSERT INTO DEPARTMENTS (DEPARTMENT_ID,DEPARTMENT_NAME) VALUES (numer_max,'EDUCATION');
+END;
+
+ZAD 2)
+
+DECLARE
+    numer_max INT;
+BEGIN
+   SELECT MAX(DEPARTMENT_ID) INTO numer_max FROM DEPARTMENTS;
+   DBMS_OUTPUT.put_line (numer_max);
+   UPDATE DEPARTMENTS SET location_id = 3000 WHERE DEPARTMENT_ID = numer_max;
+END;
+
+ZAD 3) 
+
+CREATE TABLE nowa(numer INT);
+DECLARE
+   counter INT:=1;
+BEGIN
+   FOR counter IN 1..10 LOOP
+    IF counter = 4 OR counter=6 THEN
+     CONTINUE;
+    ELSE
+     INSERT INTO nowa (numer) VALUES(counter);
+    END IF;
+   END LOOP;
+END;
+
+
+ZAD 4)
+
+DECLARE
+   rec COUNTRIES%ROWTYPE;
+BEGIN
+   SELECT * INTO rec FROM COUNTRIES WHERE COUNTRY_ID = 'CA';
+   DBMS_OUTPUT.PUT_LINE(rec.COUNTRY_NAME);
+   DBMS_OUTPUT.PUT_LINE(rec.REGION_ID);
+END;
+
+
+ZAD 5)
+
+DECLARE
+    TYPE typ IS TABLE OF departments%rowtype INDEX BY PLS_INTEGER;
+    dep_names typ;
+BEGIN
+    FOR i IN 1..10 LOOP
+        SELECT * INTO dep_names(i) FROM departments d WHERE d.department_id = (i*10);
+    END LOOP;
+
+    FOR i IN dep_names.first..dep_names.last LOOP
+        dbms_output.put_line(dep_names(i).department_name);
+    END LOOP;
+
+END;
+
+ZAD 6)
+
+ZAD 7)
+
+DECLARE
+    CURSOR wynagrodzenie IS SELECT last_name,salary FROM EMPLOYEES WHERE
+    department_id = 50;
+    salary employees.salary%TYPE;
+    last_name employees.last_name%TYPE;
+BEGIN
+    OPEN wynagrodzenie;
+    LOOP
+        FETCH wynagrodzenie INTO last_name,salary;
+        IF ( salary >= 3100) THEN
+        dbms_output.put_line(last_name || ' nie dawać podwyżki');
+        ELSE
+            dbms_output.put_line(last_name || ' dać podwyżkę');
+        END IF;
+    END LOOP;
+    CLOSE wynagrodzenie;
+END;
+
+
+ZAD 8)
+a)
+DECLARE
+    CURSOR wynagrodzenie ( min NUMBER, max NUMBER, letter_in_first_name STRING) IS
+    SELECT first_name, last_name FROM employees WHERE
+    salary BETWEEN min AND max
+    AND lower(first_name) LIKE '%' || lower(letter_in_first_name) || '%';
+    last_name  employees.last_name%TYPE;
+    first_name employees.first_name%TYPE;
+BEGIN
+    OPEN wynagrodzenie(1000, 5000, 'A');
+    LOOP
+        FETCH wynagrodzenie INTO first_name, last_name;
+        EXIT WHEN wynagrodzenie%notfound;
+        dbms_output.put_line(first_name|| ' '|| last_name);
+    END LOOP;
+    CLOSE wynagrodzenie;
+END;
+
+b)
+DECLARE
+    CURSOR wynagrodzenie ( min NUMBER, max NUMBER, letter_in_first_name STRING) IS
+    SELECT first_name, last_name FROM employees WHERE
+    salary BETWEEN min AND max
+    AND lower(first_name) LIKE '%' || lower(letter_in_first_name) || '%';
+    last_name  employees.last_name%TYPE;
+    first_name employees.first_name%TYPE;
+BEGIN
+    OPEN wynagrodzenie(5000, 20000, 'U');
+    LOOP
+        FETCH wynagrodzenie INTO first_name, last_name;
+        EXIT WHEN wynagrodzenie%notfound;
+        dbms_output.put_line(first_name|| ' '|| last_name);
+    END LOOP;
+    CLOSE wynagrodzenie;
+END;
+
+9)
+a)
+create or replace PROCEDURE addjob (job_id STRING, job_title STRING) AS
+BEGIN
+    INSERT INTO jobs (job_id, job_title) VALUES (job_id, job_title);
+EXCEPTION
+    WHEN others THEN
+        dbms_output.put_line('Something went wrong!');
+END;
+
+b)
+
+create or replace PROCEDURE changejobtitle ( job_id_input STRING, job_title_input STRING ) AS not_updated EXCEPTION;
+BEGIN
+    UPDATE jobs SET job_title = job_title_input
+    WHERE job_id = job_id_input;
+EXCEPTION
+    WHEN not_updated THEN
+        dbms_output.put_line('Updated rows 0! Error!');
+    WHEN OTHERS THEN
+        dbms_output.put_line('Something went wrong!');
+END;
+
+c)
+create or replace PROCEDURE deletejob ( job_id_input STRING) AS not_deleted EXCEPTION;
+BEGIN
+    DELETE FROM jobs WHERE job_id = job_id_input;
+EXCEPTION
+    WHEN not_deleted THEN
+        dbms_output.put_line('Deleted 0 rows! Error!');
+    WHEN OTHERS THEN
+        dbms_output.put_line('Something went wrong!');
+END;
+
+d)
+create or replace procedure salaryNames(id STRING) IS
+    salary_output EMPLOYEES%ROWTYPE;
+BEGIN
+    SELECT * into salary_output FROM EMPLOYEES WHERE EMPLOYEE_ID = id;
+    DBMS_OUTPUT.PUT_LINE(salary_output.salary);
+    DBMS_OUTPUT.PUT_LINE(salary_output.last_name);
+END;
+
+e)
